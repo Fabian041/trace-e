@@ -27,10 +27,11 @@
 <!-- /END GA --></head>
 
 <body>
-  <div id="app">
-    <div class="main-wrapper main-wrapper-1">
+
+  <div id="app" class="p-5" style="padding-top: 2rem !important">
+
       @yield('main')
-    </div>
+
   </div>
 
   <!-- General JS Scripts -->
@@ -41,6 +42,8 @@
   <script src={{ asset("assets/modules/nicescroll/jquery.nicescroll.min.js") }}></script>
   <script src={{ asset("assets/modules/moment.min.js") }}></script>
   <script src={{ asset("assets/js/stisla.js") }}></script>
+
+  @yield('custom-script')
   
   <!-- JS Libraies -->
 
