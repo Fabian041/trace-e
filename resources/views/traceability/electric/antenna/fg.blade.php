@@ -10,14 +10,15 @@
                 <input id="code" type="text" class="form-control" name="code" tabindex="1" placeholder="scan part here..." required autofocus>
                 
                 <div class="row mt-3">
-                    <div class="col-md-2" style="margin-top: 4rem">
-                        <h1 class="text-dark">ASAN01</h1>
+                    <div class="col-md-2" style="margin-top: 2.5rem">
+                        <p style="color: #595757; font-size:1.5rem; font-weight: bold">Line</p>
+                        <h1 class="text-dark" style="font-weight: 800 !impoertant">ASAN01</h1>
                     </div>
                     <div class="col-md-10">
                         <div class="hero bg-primary text-dark">
                             <div class="hero-inner">
-                                <h5 class="text-leftr" style="color: #ffffff; margin-top:-1.5rem">Success</h5>
-                                <h1 class="text-center" style="color: #ffffff">081920192819281</h1>
+                                <h5 class="text-left" style="color: #ffffff; margin-top:-1.5rem">Part Scanned</h5>
+                                <h1 class="text-center" style="color: #ffffff">-</h1>
                             </div>
                         </div>
                     </div>
@@ -33,7 +34,7 @@
             <div class="hero-inner">
                 <div class="row">
                     <div class="col-10 col-sm-10 col-md-10">
-                        <h5 class="text-left" style="color:#595757;">Part Scanned</h5>
+                        <h5 class="text-left" style="color:#595757;">Parts Scanned</h5>
                         <div class="bg-secondary m-auto" style="max-height: 7rem; width: 100%; border-radius: 6px;">
                             <div class="list-group mt-3" style="max-height: 7rem; width: 100%; overflow:scroll; overflow-x: hidden">
                                 <li class="list-group-item">
@@ -67,6 +68,10 @@
         </div>
     </div>
 </div>
+@endsection
 
-
+@section('custom-script')
+    <script src="text/javascript">
+        
+    </script>
 @endsection
