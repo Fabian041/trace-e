@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
+use Carbon\Carbon;
+use App\Models\TraceKanban;
 use App\Models\KanbanMaster;
 use App\Models\TraceAntenna;
-use App\Models\TraceKanban;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class TraceabilityController extends Controller
 {
@@ -50,8 +54,7 @@ class TraceabilityController extends Controller
                 } else {
                     return array(
                         'status' => 'success',
-                        'backNumber' => $backNumber,
-                        'serialNumber' => $serialNumber
+                        'code' => $backNumber . '#' . $serialNumber
                     );
                 }
             } else {
@@ -65,5 +68,75 @@ class TraceabilityController extends Controller
                 'code' => $th->getMessage()
             );
         }
+    }
+
+    public function storePart(Request $request)
+    {
+        $serialNumber = $request->kanban;
+
+        // substring the part code
+        $code = substr($request->code, 0, 11);
+
+        // search kanban id based on serial number
+        $kanban = TraceKanban::select('id')->where('serial_number', $serialNumber)->first();
+
+        // check if the code is exists in trace antenna inside spesific kanban
+        $checkPart = TraceAntenna::where('code', $code)->first();
+
+        if ($checkPart != null) {
+            return [
+                'status' => 'exist'
+            ];
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // insert part into trace antenna
+            TraceAntenna::create([
+                'kanban_id' => $kanban->id,
+                'code' => $code,
+                'npk' => auth()->user()->npk,
+                'date' => Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+
+            $key = 'electric_antenna';
+            if (Cache::has($key)) {
+                $cache = Cache::get($key);
+                if (!isset($cache[date('Y-m-d')])) {
+                    $cache = [];
+                    $cache = [
+                        date('Y-m-d') => [
+                            'counter' => 1
+                        ]
+                    ];
+                } else {
+                    $cache[date('Y-m-d')]['counter'] += 1;
+                }
+            } else {
+                $cache = [
+                    date('Y-m-d') => [
+                        'counter' => 1
+                    ]
+                ];
+            }
+
+            Cache::forever($key, $cache);
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return [
+                "status" => "error",
+                "messege" => $th->getMessage()
+            ];
+        }
+
+        return [
+            "status" => "success",
+            "counter"   => $cache[date('Y-m-d')]['counter'],
+            "code" => $code
+        ];
     }
 }

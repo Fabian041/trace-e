@@ -33,23 +33,22 @@
         <div class="shadow hero bg-white text-dark rounded-3">
             <div class="hero-inner">
                 <div class="row">
-                    <div class="col-10 col-sm-10 col-md-10 col-sm-12">
+                    <div class="col-9 col-sm-9 col-md-9 col-sm-12">
                         <h5 class="text-left" style="color:#595757;">Parts Scanned</h5>
                         <div class="bg-secondary m-auto" style="max-height: 7rem; width: 100%; border-radius: 6px;">
-                            <div class="list-group mt-3" style="max-height: 7rem; width: 100%; overflow:scroll; overflow-x: hidden">
-                                <li class="list-group-item">
+                            <div class="list-group mt-3" style="max-height: 7rem; width: 100%; overflow:scroll; overflow-x: hidden" id="part-scanned">
+                                <li class="list-group-item example-list" id="example-list">
                                     <h4 style="color: #ffffff">081920192819281</h4>
-                                </li>
-                                <li class="list-group-item">
+                                    <h4 style="color: #ffffff">081920192819281</h4>
                                     <h4 style="color: #ffffff">081920192819281</h4>
                                 </li>
                             </div>
                         </div>
                     </div>
-                    <div class="col-2 col-sm-2 col-md-2 col-sm-12">
+                    <div class="col-3 col-sm-3 col-md-3 col-sm-12">
                         <h5 class="text-center mb-3" style="color:#595757;">Kanban</h5>
-                        <div class="bg-primary m-auto" style="height: 7rem; width: 100%; background-color:#EAEEED; border-radius: 6px; padding: 35px 0">
-                            <h1 class="text-center" style="color: #ffffff;" id="kanban-scanned"></h1>         
+                        <div class="m-auto" style="height: 7rem; width: 100%; background-color:#EAEEED; border-radius: 6px; padding: 35px 0">
+                            <h1 class="text-center" style="color: #000000;" id="kanban-scanned"></h1>         
                         </div>
                     </div>
                 </div>
@@ -61,8 +60,8 @@
         <div class="shadow pt-4"  style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
             <div class="hero-inner">
                 <h5 class="text-center"  style="color:#595757;">Total Scan</h5>
-                <div class="bg-primary m-auto shadow" style="height: 13rem; width: 85%; border-radius: 6px; padding: 80px 0">
-                    <h1 class="text-center" style="color: #ffffff;" id="total-scan">0</h1>
+                <div class="m-auto shadow" style="background-color:#EAEEED; height: 13rem; width: 85%; border-radius: 6px; padding: 80px 0">
+                    <h1 class="text-center" style="color: #000000;" id="total-scan">0</h1>
                 </div>
             </div>
         </div>
@@ -116,9 +115,16 @@
 
 @section('custom-script')
 <script>
-    
+    function initApp(){
+        let kanban = localStorage.getItem('kanban');
+        
+        if (kanban != null || kanban != undefined) {
+            $('#kanban-scanned').text(kanban);
+        }
+    }
+
     $(document).ready(function() {
-        // initApp();
+        initApp();
         $('#code').focus(); 
         $('#infoModal').modal('show');
         
@@ -141,24 +147,23 @@
                 barcodecomplete = barcode;
                 barcode = "";
                 console.log(barcodecomplete);
-                if (barcodecomplete.length == 15) {
-                    // if (checkDataLocal() == true ){
+                if (barcodecomplete.length == 21) {
+                    // if data kanban exists inside local storage
+                    if (checkDataLocal() == true ){
+                        // insert part
+                        storePart(barcodecomplete);
                         
-                    //     // insert part
-                        
-                    // }else{
-                    //     notifMessege("error", "Scan Kanban Dulu!");
-                    // }
-                    alert('test');
+                    }else{
+                        notifMessege("error", "Scan Kanban Dulu!");
+                    }
                 } 
                 else if(barcodecomplete.length == 230) 
                 {
-                    // check master and serial code kanban
                     storeKanban(barcodecomplete);
                 } 
                 else if(barcodecomplete.length != 230) 
                 {
-                    notifMessege('error', 'Kanban Tidak Dikenali')
+                    notifMessege('error', 'Part atau Kanban Tidak Dikenali')
                 }
                 else if (barcodecomplete.length == 13)
                 {
@@ -198,7 +203,7 @@
                 success: function (data) {
                     console.log(data);
                     if (data.status == "success") {
-                        saveDataLocalStorage(data.backNumber, data.serialNumber);
+                        saveDataLocalStorage(data.code);
                         return true
                     } else if (data.status== "error") {
                         notifMessege("error", data.messege);
@@ -228,22 +233,27 @@
         };
         
         function storePart(code) {
+            let kanban = localStorage.getItem('kanban');
+
             $.ajax({
                 type: 'get',
-                url: "{{ url('/trace/scan/antenna/') }}",
+                url: "{{ url('/trace/scan/antenna/storePart') }}",
                 data: {
                     code : code,
+                    kanban : kanban.substr(5, 4),
                 },
                 dataType: 'json',
                 success: function (data) {
                     if (data.status == "success") {
-                        clearLocalStorage()
+                        $('#total-scan').text(data.counter);
+                        notifMessege("success", data.code);
+                        displayPart(data.code);
                         return true
                     } else if (data.status== "error") {
-                        notifMessege("error", data.masssege);
+                        notifMessege("error", data.messege);
                         return false
-                    } else if (data.status == "Kanbannotreset") {
-                        notifMessege("error", "Kanban masih berisi Part");
+                    } else if (data.status == "exist") {
+                        notifMessege("error", "Part Sudah Ada");
                         return false
                     } else if (data.status == "notregistered") {
                         notifMessege("error", "Kanban Tidak Terdaftar");
@@ -264,13 +274,12 @@
         }
         
         
-        function saveDataLocalStorage(backNumber, serialNumber) {
-            console.log(serialNumber);
+        function saveDataLocalStorage(backNumber) {
             let kanban = localStorage.getItem('kanban');
             if (kanban == null || kanban == undefined) {
-                localStorage.setItem('kanban', serialNumber);
-                $('#kanban-scanned').text(serialNumber);
-                notifMessege("success", backNumber + '#' + serialNumber);
+                localStorage.setItem('kanban', backNumber);
+                $('#kanban-scanned').text(backNumber);
+                notifMessege("success", backNumber);
                 console.log('test');
             } else {
                 
@@ -283,14 +292,24 @@
                 
                 // check is it multiple of 100
                 if(current_counter % 100 == 0){
-                    localStorage.setItem('kanban', serialNumber);
-                    $('#kanban-scanned').text(serialNumber);
-                    notifMessege("success", backNumber + '#' + serialNumber);
+                    localStorage.setItem('kanban', backNumber);
+                    $('#parts').removeClass('parts');
+                    $('#kanban-scanned').text(backNumber);
+                    notifMessege("success", backNumber);
                 }else{
                     notifMessege("error", "Part belum lengkap");
                 }
             }
             
+        }
+
+        function displayPart(code){
+            $('#example-list').remove();
+
+            $('#part-scanned').append(
+                `<li class="list-group-item parts" id="parts">
+                    <h4 style="color: #000000">${code}</h4>
+                </li>`);
         }
         
         function checkDataLocal() {

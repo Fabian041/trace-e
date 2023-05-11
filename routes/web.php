@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     // FG
     Route::get('trace/scan/antenna', [TraceabilityController::class, 'index'])->name('antenna.index');
     Route::get('trace/scan/antenna/storeKanban', [TraceabilityController::class, 'storeKanban'])->name('antenna.storeKanban');
+    Route::get('trace/scan/antenna/storePart', [TraceabilityController::class, 'storePart'])->name('antenna.storePart');
 
     // NG
     Route::get('trace/scan/antenna/ng', [TraceabilityController::class, 'ng-index'])->name('antenna.ng.index');
