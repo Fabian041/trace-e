@@ -17,7 +17,7 @@ use App\Http\Controllers\TraceabilityController;
 */
 
 Route::get('/', function () {
-    return view('electric.dashboard');
+    return view('traceability.dashboard');
 });
 
 // unauthencticated user
@@ -33,4 +33,6 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('trace/scan/antenna', [TraceabilityController::class, 'index'])->name('antenna.index');
+    
+    Route::get('trace/scan/antenna/ng', [TraceabilityController::class, 'index_ng'])->name('antenna.index');
 });
