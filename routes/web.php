@@ -17,8 +17,8 @@ use App\Http\Controllers\TraceabilityController;
 */
 
 Route::get('/', function () {
-    return view('electric.dashboard');
-});
+    return view('layouts.auth.login');
+})->middleware('guest');
 
 // unauthencticated user
 Route::middleware(['guest'])->group(function () {
@@ -32,5 +32,10 @@ Route::middleware(['guest'])->group(function () {
 // authenticated user
 Route::middleware(['auth'])->group(function () {
 
+    // FG
     Route::get('trace/scan/antenna', [TraceabilityController::class, 'index'])->name('antenna.index');
+    Route::get('trace/scan/antenna/storeKanban', [TraceabilityController::class, 'storeKanban'])->name('antenna.storeKanban');
+
+    // NG
+    Route::get('trace/scan/antenna/ng', [TraceabilityController::class, 'ng-index'])->name('antenna.ng.index');
 });
