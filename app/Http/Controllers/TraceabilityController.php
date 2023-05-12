@@ -6,7 +6,9 @@ use DateTime;
 use Carbon\Carbon;
 use App\Models\TraceKanban;
 use App\Models\KanbanMaster;
+use App\Models\NgMaster;
 use App\Models\TraceAntenna;
+use App\Models\TraceNg;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -137,6 +139,71 @@ class TraceabilityController extends Controller
             "status" => "success",
             "counter"   => $cache[date('Y-m-d')]['counter'],
             "code" => $code
+        ];
+    }
+
+    public function ngCheck(Request $request)
+    {
+        // get id ng
+        $ngId = $request->ng;
+
+        //check ig ng exist
+        $ng = NgMaster::where('id', $ngId)->first();
+
+        if ($ng == null) {
+            return [
+                'status' => 'error',
+                'message' => 'ID NG Tidak Ditemukan!'
+            ];
+        }
+
+        return ['status' => 'success'];
+    }
+
+    public function ngAntenna($ngId)
+    {
+        $ngName = NgMaster::select('name')->where('id', $ngId)->first();
+
+        return view('traceability.electric.antenna.ng', [
+            'ngName' => $ngName,
+            'ngId' => $ngId
+        ]);
+    }
+
+    public function storeNgAntenna($ngId, $part)
+    {
+        // check if part is exist
+        $ngTrace = TraceNg::where('code', $part)->first();
+
+        if ($ngTrace != null) {
+            return [
+                'status' => 'error',
+                'message' => 'Part Sudah Pernah Discan!'
+            ];
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // insert into trace ng dataabase
+            TraceNg::create([
+                'ng_id' => $ngId,
+                'code' => $part,
+                'date' => Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return [
+                "status" => "error",
+                "messege" => $th->getMessage()
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'message' => 'Part NG Berhasil Disimpan'
         ];
     }
 }

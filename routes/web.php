@@ -32,11 +32,17 @@ Route::middleware(['guest'])->group(function () {
 // authenticated user
 Route::middleware(['auth'])->group(function () {
 
-    // FG
-    Route::get('trace/scan/antenna', [TraceabilityController::class, 'index'])->name('antenna.index');
-    Route::get('trace/scan/antenna/storeKanban', [TraceabilityController::class, 'storeKanban'])->name('antenna.storeKanban');
-    Route::get('trace/scan/antenna/storePart', [TraceabilityController::class, 'storePart'])->name('antenna.storePart');
+    Route::prefix('trace/scan')->group(function () {
+        // FG
+        Route::get('antenna', [TraceabilityController::class, 'index'])->name('antenna.index');
+        Route::get('antenna/storeKanban', [TraceabilityController::class, 'storeKanban'])->name('antenna.storeKanban');
+        Route::get('antenna/storePart', [TraceabilityController::class, 'storePart'])->name('antenna.storePart');
 
-    // NG
-    Route::get('trace/scan/antenna/ng', [TraceabilityController::class, 'ng-index'])->name('antenna.ng.index');
+        // NG
+        Route::get('antenna/ng/{ngId}', [TraceabilityController::class, 'ngAntenna'])->name('antenna.ng.index');
+        Route::get('antenna/ng/store/{ngId}/{part}', [TraceabilityController::class, 'storeNgAntenna'])->name('antenna.ng.store');
+
+        // ng check
+        Route::get('ng/check', [TraceabilityController::class, 'ngCheck'])->name('ng.check');
+    });
 });

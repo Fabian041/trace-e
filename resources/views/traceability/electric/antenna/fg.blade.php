@@ -117,10 +117,16 @@
 <script>
     function initApp(){
         let kanban = localStorage.getItem('kanban');
+        let counter = localStorage.getItem('counter');
         
         if (kanban != null || kanban != undefined) {
             $('#kanban-scanned').text(kanban);
         }
+
+        if (counter != null || counter != undefined) {
+            $('#total-scan').text(counter);
+        }
+        
     }
 
     $(document).ready(function() {
@@ -161,19 +167,19 @@
                 {
                     storeKanban(barcodecomplete);
                 } 
-                else if(barcodecomplete.length != 230) 
+                // improve ng at double scan part
+                else if (barcodecomplete.length <= 2)
                 {
-                    notifMessege('error', 'Part atau Kanban Tidak Dikenali')
+                    checkNg(barcodecomplete);
                 }
                 else if (barcodecomplete.length == 13)
                 {
                     window.location.replace("{{url('//logout')}}");
                     
                 }
-                else if (barcodecomplete == "NGMODE")
+                else if(barcodecomplete.length != 230) 
                 {
-                    window.location.replace("{{url('/trace/scan/antenna/ng')}}");
-                    
+                    notifMessege('error', 'Part atau Kanban Tidak Dikenali')
                 }
                 else if (barcodecomplete == "RELOAD")
                 {
@@ -246,6 +252,7 @@
                 success: function (data) {
                     if (data.status == "success") {
                         $('#total-scan').text(data.counter);
+                        localStorage.setItem('counter', data.counter);
                         notifMessege("success", data.code);
                         displayPart(data.code);
                         return true
@@ -260,6 +267,36 @@
                         return false
                     } else if (data.status == "unfinished") {
                         notifMessege("error", "Part belum lengkap");
+                        return false
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status == 0) {
+                        notifMessege("error", 'Connection Error');
+                        return;
+                    }
+                    notifMessege("error", 'Fatal Error');
+                }
+            });
+        }
+
+        function checkNg(ngId){
+            $.ajax({
+                type: 'get',
+                url: "{{ url('/trace/scan/ng/check') }}",
+                data: {
+                    ng : ngId,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == "success") {
+
+                        // redirect to ng mode
+                        window.location.replace("{{url('/trace/scan/antenna/ng')}}"+"/"+ ngId);
+
+                        return true
+                    } else if (data.status== "error") {
+                        notifMessege("error", data.message);
                         return false
                     }
                 },

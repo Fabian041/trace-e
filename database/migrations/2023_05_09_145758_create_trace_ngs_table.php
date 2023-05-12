@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('trace_ngs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('ng_id')->unsigned();
-            $table->foreign('ng_id')->references('id')->on('trace_antennas');
+            $table->foreign('ng_id')->references('id')->on('trace_ng_masters');
             $table->string('code');
             $table->timestamp('date');
             $table->timestamps();
