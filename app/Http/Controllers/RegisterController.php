@@ -27,6 +27,6 @@ class RegisterController extends Controller
 
         User::create($validatedData);
 
-        return redirect('/login');
+        return redirect('/login')->with('success', 'Your account has been created');
     }
 }
