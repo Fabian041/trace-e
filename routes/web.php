@@ -32,6 +32,10 @@ Route::middleware(['guest'])->group(function () {
 // authenticated user
 Route::middleware(['auth'])->group(function () {
 
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout.auth');
+
+    Route::get('/trace/part', [TraceabilityController::class, 'traceIndex'])->name('traceability.index');
+
     Route::prefix('trace/scan')->group(function () {
         // FG
         Route::get('antenna', [TraceabilityController::class, 'index'])->name('antenna.index');

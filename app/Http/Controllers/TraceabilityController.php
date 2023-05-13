@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Cache;
 
 class TraceabilityController extends Controller
 {
+    // traceabilty dashboard
+    public function traceIndex()
+    {
+        return view('traceability.dashboard');
+    }
+
     // modul antenna
     public function index()
     {
@@ -74,18 +80,25 @@ class TraceabilityController extends Controller
 
     public function storePart(Request $request)
     {
-        $serialNumber = $request->kanban;
+        $serialNumber = $request->serialNumber;
+        $backNumber = $request->backNumber;
+        $code = $request->code;
 
         // substring the part code
-        $code = substr($request->code, 0, 11);
+        $model = substr($request->code, 9, 2);
 
         // search kanban id based on serial number
         $kanban = TraceKanban::select('id')->where('serial_number', $serialNumber)->first();
 
+        // search model code based on back number
+        $modelCode = KanbanMaster::select('model_code')->where('back_number', $backNumber)->first();
+
         // check if the code is exists in trace antenna inside spesific kanban
         $checkPart = TraceAntenna::where('code', $code)->first();
+        $checkNgPart = TraceNg::where('code', $code)->first();
 
-        if ($checkPart != null) {
+
+        if ($checkPart != null && $checkNgPart != null) {
             return [
                 'status' => 'exist'
             ];
@@ -94,13 +107,19 @@ class TraceabilityController extends Controller
         try {
             DB::beginTransaction();
 
-            // insert part into trace antenna
-            TraceAntenna::create([
-                'kanban_id' => $kanban->id,
-                'code' => $code,
-                'npk' => auth()->user()->npk,
-                'date' => Carbon::now()->format('Y-m-d H:i:s')
-            ]);
+            // interlock part for spesific model
+            if ($modelCode->model_code == $model) {
+                // insert part into trace antenna
+                TraceAntenna::create([
+                    'kanban_id' => $kanban->id,
+                    'code' => $request->code,
+                    'npk' => auth()->user()->npk,
+                    'date' => Carbon::now()->format('Y-m-d H:i:s')
+                ]);
+            } else {
+                return ['status' => 'notMatch'];
+            }
+
 
             $key = 'electric_antenna';
             if (Cache::has($key)) {
@@ -138,7 +157,7 @@ class TraceabilityController extends Controller
         return [
             "status" => "success",
             "counter"   => $cache[date('Y-m-d')]['counter'],
-            "code" => $code
+            "code" => $request->code
         ];
     }
 

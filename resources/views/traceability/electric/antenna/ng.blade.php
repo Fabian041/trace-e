@@ -7,20 +7,23 @@
                     {{ auth()->user()->name }}</span></h5>
             <div class="shadow hero bg-white text-dark rounded-3">
                 <div class="hero-inner">
-                    <div class="row mb-3 w-100">
-                        <div class="col-12 d-flex justify-content-center w-100">
-                            <h1 class="text-dark" style="font-weight: 800 !impoertant">Input Part NG - LINE ASAN01</h1>
+                    <div class="row mb-3">
+                        <p class="text-right text-dark w-100">LINE ASAN01</p>
+                        <div class="col-12">
+                            <h1 class="text-dark text-center" style="font-weight: 800 !important">Part NG</h1>
                         </div>
                     </div>
-                    <div class="row mb-3 w-100">
-                        <div class="col-12 d-flex justify-content-center w-100">
-                            <h1 class="text-danger" style="font-weight: 400 !impoertant">{{ $ngName->name }}</h1>
+                    <div class="row mb-3 mt-5">
+                        <div class="col-12">
+                            <div class="bg-danger m-auto" style="height: 7rem; width: 50%; background-color:#EAEEED; border-radius: 20px; padding: 35px 0">
+                                <h1 class="text-center" style="color: #ffffff;" id="ng">{{ $ngName->name}}</h1>         
+                            </div>
                         </div>
                     </div>
 
-                    <form class="row mb-3 w-100">
+                    <form class="row mb-3 mt-5">
                         <input id="code" type="text" class="form-control" name="code" tabindex="1"
-                            placeholder="scan part here..." autofocus>
+                            placeholder="scan part here..." autofocus autocomplete="off">
                     </form>
                 </div>
             </div>
@@ -31,6 +34,11 @@
 @section('custom-script')
 <script>
     $(document).ready(function() {
+
+        $(document).on('click', function() {
+            $('#code').focus(); 
+        })
+
         let part = "";
         let ngcode = "{{$ngId}}";
         $('#code').focus();
