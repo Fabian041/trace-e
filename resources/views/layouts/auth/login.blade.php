@@ -51,7 +51,8 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4"
+                                        id="login">
                                         Login
                                     </button>
                                 </div>

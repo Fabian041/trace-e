@@ -130,6 +130,20 @@
             }
 
             if (counter != null || counter != undefined) {
+
+                // Get the stored timestamp from local storage
+                var storedTime = parseInt(localStorage.getItem('counter_stored_time'));
+
+                // Get the current timestamp
+                var currentTime = new Date().getTime();
+
+                // Check if one day has passed (24 hours = 86400000 milliseconds)
+                if (currentTime - storedTime > 86400000) {
+                    // Clear the item from local storage
+                    localStorage.removeItem('counter');
+                    localStorage.removeItem('counter_stored_time');
+                }
+
                 $('#total-scan').text(counter);
             }
         }
@@ -182,9 +196,23 @@
                     // improve ng at double scan part
                     else if (barcodecomplete.length <= 2) {
                         checkNg(barcodecomplete);
-                    } else if (barcodecomplete == "LOGOUT") {
+                    } else if (barcodecomplete == "DONE") {
                         localStorage.removeItem('first');
-                        window.location.replace("{{ url('/logout') }}");
+
+                        var form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = "{{ url('/logout') }}";
+
+                        // Add a CSRF token field to the form
+                        var csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = '_token';
+                        csrfToken.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfToken);
+
+                        // Append the form to the body and submit it
+                        document.body.appendChild(form);
+                        form.submit();
 
                     } else if (barcodecomplete.length != 230) {
                         notifMessege('error', 'Part atau Kanban Tidak Dikenali')
@@ -226,7 +254,7 @@
                             notifMessege("error", "Part belum lengkap");
                             return false
                         } else {
-                            notifMessege("error", "Server Error");
+                            notifMessege("error", "Internal Server Error");
                             return false
                         }
                     },
@@ -235,7 +263,7 @@
                             notifMessege("error", 'Connection Error');
                             return;
                         }
-                        notifMessege("error", 'Fatal Error');
+                        notifMessege("error", 'Internal Server Error');
                     }
                 });
             };
@@ -255,7 +283,16 @@
                     success: function(data) {
                         if (data.status == "success") {
                             $('#total-scan').text(data.counter);
-                            localStorage.setItem('counter', data.counter);
+
+                            if (!localStorage.getItem('counter')) {
+                                // set tiem
+                                localStorage.setItem('counter', data.counter);
+
+                                // Set the current timestamp in local storage
+                                localStorage.setItem('counter_stored_time', new Date().getTime()
+                                    .toString());
+                            }
+
                             notifMessege("success", data.code);
                             displayPart(data.code);
                             return true
@@ -281,7 +318,7 @@
                             notifMessege("error", 'Connection Error');
                             return;
                         }
-                        notifMessege("error", 'Fatal Error');
+                        notifMessege("error", 'Internal Server Error');
                     }
                 });
             }
@@ -311,7 +348,7 @@
                             notifMessege("error", 'Connection Error');
                             return;
                         }
-                        notifMessege("error", 'Fatal Error');
+                        notifMessege("error", 'Internal Server Error');
                     }
                 });
             }

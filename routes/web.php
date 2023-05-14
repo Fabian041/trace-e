@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout.auth');
 
     Route::get('/trace/part', [TraceabilityController::class, 'traceIndex'])->name('traceability.index');
+    Route::get('/trace/part/{code}', [TraceabilityController::class, 'trace'])->name('traceability.trace');
 
     Route::prefix('trace/scan')->group(function () {
         // FG

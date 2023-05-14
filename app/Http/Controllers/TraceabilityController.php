@@ -27,6 +27,57 @@ class TraceabilityController extends Controller
         return view('traceability.electric.antenna.fg');
     }
 
+    public function trace($code)
+    {
+
+        // substring shot from code
+        $shot = substr($code, 17, 4);
+        $modelCode = substr($code, 9, 2);
+
+        // search the back number based on model code
+        $backNumber = KanbanMaster::select('back_number')->where('model_code', $modelCode)->first();
+        if ($backNumber == null) {
+            $backNumber = 'unknown';
+        } else {
+            $backNumber = $backNumber->back_number;
+        }
+
+        // antenna 
+        $partOk = DB::table('trace_antennas')
+            ->join('trace_kanbans', 'trace_antennas.kanban_id', '=', 'trace_kanbans.id')
+            ->join('trace_kanban_masters', 'trace_kanbans.master_id', '=', 'trace_kanban_masters.id')
+            ->select('trace_kanban_masters.back_number', 'trace_antennas.date', 'trace_antennas.npk')
+            ->where('trace_antennas.code', $code)
+            ->first();
+
+        //ng
+        $partNg = TraceNg::where('code', $code)->first();
+
+
+        if ($partOk == null && $partNg == null) {
+            return [
+                'status' => 'null'
+            ];
+        } else if ($partOk != null && $partNg == null) {
+            return [
+                'status' => 'successOk',
+                'date' => $partOk->date,
+                'npk' => $partOk->npk,
+                'model' => $partOk->back_number,
+                'shot' => $shot
+
+            ];
+        } else if ($partOk == null && $partNg != null) {
+            return [
+                'status' => 'successNg',
+                'date' => $partNg->date,
+                'npk' => $partNg->npk,
+                'model' => $backNumber,
+                'shot' => $shot
+            ];
+        }
+    }
+
     public function storeKanban(Request $request)
     {
         // substring the kanban code
@@ -193,8 +244,9 @@ class TraceabilityController extends Controller
     {
         // check if part is exist
         $ngTrace = TraceNg::where('code', $part)->first();
+        $okTrace = TraceAntenna::where('code', $part)->first();
 
-        if ($ngTrace != null) {
+        if ($ngTrace != null && $okTrace != null) {
             return [
                 'status' => 'error',
                 'message' => 'Part Sudah Pernah Discan!'
@@ -208,6 +260,7 @@ class TraceabilityController extends Controller
             TraceNg::create([
                 'ng_id' => $ngId,
                 'code' => $part,
+                'npk' => auth()->user()->npk,
                 'date' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
