@@ -149,7 +149,7 @@ class TraceabilityController extends Controller
         $checkNgPart = TraceNg::where('code', $code)->first();
 
 
-        if ($checkPart != null && $checkNgPart != null) {
+        if ($checkPart != null || $checkNgPart != null) {
             return [
                 'status' => 'exist'
             ];
@@ -246,7 +246,7 @@ class TraceabilityController extends Controller
         $ngTrace = TraceNg::where('code', $part)->first();
         $okTrace = TraceAntenna::where('code', $part)->first();
 
-        if ($ngTrace != null && $okTrace != null) {
+        if ($ngTrace != null || $okTrace != null) {
             return [
                 'status' => 'error',
                 'message' => 'Part Sudah Pernah Discan!'
