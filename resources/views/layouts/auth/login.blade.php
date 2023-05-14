@@ -20,7 +20,7 @@
                                     <label for="npk">NPK</label>
                                     <input id="npk" type="string"
                                         class="form-control @error('npk') is-invalid @enderror" name="npk"
-                                        tabindex="1" required autofocus>
+                                        tabindex="1" required autofocus autocomplete="off">
                                     @error('npk')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -81,6 +81,21 @@
         } else if (successMessage) {
             notif('success', successMessage);
         }
+
+        $(document).ready(function() {
+
+            $(document).on('click', function() {
+                $('#npk').focus();
+            })
+
+            $("#npk").keypress(function(e) {
+                if (e.keyCode == 124) {
+                    e.preventDefault();
+                    $("#password").focus();
+                }
+            });
+
+        });
 
         function notif(type, message) {
             if (type == 'error') {
