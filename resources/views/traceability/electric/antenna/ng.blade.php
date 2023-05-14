@@ -55,6 +55,8 @@
 
                     if (part.length == 21) {
                         storeNgPart(ngcode, part);
+                        $('#code').val("");
+
                     } else {
                         notif("error", "TOLONG SCAN PART KEMBALI");
                         $('#code').val("");
