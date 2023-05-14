@@ -84,9 +84,7 @@
 
         $(document).ready(function() {
 
-            $(document).on('click', function() {
-                $('#npk').focus();
-            })
+            $('#npk').focus();
 
             $("#npk").keypress(function(e) {
                 if (e.keyCode == 124) {
