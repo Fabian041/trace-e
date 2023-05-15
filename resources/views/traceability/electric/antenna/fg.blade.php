@@ -15,12 +15,21 @@
                             <p style="color: #595757; font-size:1.5rem; font-weight: bold">Line</p>
                             <h1 class="text-dark" style="font-weight: 800 !impoertant">ASAN01</h1>
                         </div>
-                        <div class="col-md-10 col-sm-12">
+                        <div class="col-md-8 col-sm-12">
                             <div class="hero bg-primary text-dark" id="alert">
                                 <div class="hero-inner">
                                     <h5 class="text-left" style="color: #ffffff; margin-top:-1.5rem" id="status">Part
                                         Scanned</h5>
                                     <h1 class="text-center" style="color: #ffffff" id="result">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2 col-sm-2 col-md-2 col-sm-12">
+                            <div class="bg-secondary pt-4"
+                                style="height: 100%; width: 100%; background-color: #4A5DE9; border-radius: 6px;">
+                                <div class="hero-inner">
+                                    <h6 class="text-center text-dark" style="color:#ffffff;">Progress</h6>
+                                    <h4 class="text-center text-dark" style="color:#ffffff; padding: 30px 0">67/100</h4>
                                 </div>
                             </div>
                         </div>
@@ -31,11 +40,11 @@
     </div>
 
     <div class="row">
-        <div class="col-10 col-sm-10 col-md-10 col-sm-12 mt-4">
+        <div class="col-6 col-sm-6 col-md-6 col-sm-12 mt-4">
             <div class="shadow hero bg-white text-dark rounded-3">
                 <div class="hero-inner">
                     <div class="row">
-                        <div class="col-9 col-sm-9 col-md-9 col-sm-12">
+                        <div class="col-7 col-sm-7 col-md-7 col-sm-12">
                             <h5 class="text-left" style="color:#595757;">Parts Scanned</h5>
                             <div class="bg-secondary m-auto" style="max-height: 7rem; width: 100%; border-radius: 6px;">
                                 <div class="list-group mt-3"
@@ -49,7 +58,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3 col-sm-3 col-md-3 col-sm-12">
+                        <div class="col-5 col-sm-5 col-md-5 col-sm-12">
                             <h5 class="text-center mb-3" style="color:#595757;">Kanban</h5>
                             <div class="bg-warning m-auto"
                                 style="height: 7rem; width: 100%; background-color:#EAEEED; border-radius: 6px; padding: 35px 0">
@@ -61,7 +70,29 @@
             </div>
         </div>
 
-        <div class="col-2 col-sm-2 col-md-2 col-sm-12 mt-4">
+        <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
+            <div class="shadow pt-4" style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
+                <div class="hero-inner">
+                    <h5 class="text-center" style="color:#595757;">Total NG</h5>
+                    <div class="bg-danger m-auto shadow"
+                        style="height: 13rem; width: 85%; border-radius: 6px; padding: 80px 0">
+                        <h1 class="text-center" style="color:#ffffff; font-size:3rem" id="total-scan-ng">0</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
+            <div class="shadow pt-4" style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
+                <div class="hero-inner">
+                    <h5 class="text-center" style="color:#595757;">Total OK</h5>
+                    <div class="bg-success m-auto shadow"
+                        style="height: 13rem; width: 85%; border-radius: 6px; padding: 80px 0">
+                        <h1 class="text-center" style="color:#ffffff; font-size:3rem" id="total-scan-ok">0</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
             <div class="shadow pt-4" style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
                 <div class="hero-inner">
                     <h5 class="text-center" style="color:#595757;">Total Scan</h5>
@@ -120,16 +151,17 @@
 @endsection
 
 @section('custom-script')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         function initApp() {
             let kanban = localStorage.getItem('kanban');
-            let counter = localStorage.getItem('counter');
+            let counter_ok = localStorage.getItem('counter_ok');
 
             if (kanban != null || kanban != undefined) {
                 $('#kanban-scanned').text(kanban);
             }
 
-            if (counter != null || counter != undefined) {
+            if (counter_ok != null || counter_ok != undefined) {
 
                 // Get the stored timestamp from local storage
                 var storedTime = parseInt(localStorage.getItem('counter_stored_time'));
@@ -140,16 +172,35 @@
                 // Check if one day has passed (24 hours = 86400000 milliseconds)
                 if (currentTime - storedTime > 86400000) {
                     // Clear the item from local storage
-                    localStorage.removeItem('counter');
+                    localStorage.removeItem('counter_ok');
                     localStorage.removeItem('counter_stored_time');
                 }
 
-                $('#total-scan').text(counter);
+                $('#total-scan').text(counter_ok);
             }
         }
 
         $(document).ready(function() {
             initApp();
+
+            var options = {
+                series: [70],
+                chart: {
+                    height: 150,
+                    type: 'radialBar',
+                },
+                plotOptions: {
+                    radialBar: {
+                        hollow: {
+                            size: '70%',
+                        }
+                    },
+                },
+                labels: ['Cricket'],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#progress"), options);
+            chart.render();
 
             let first = localStorage.getItem('first');
 
@@ -282,11 +333,11 @@
                     dataType: 'json',
                     success: function(data) {
                         if (data.status == "success") {
-                            $('#total-scan').text(data.counter);
+                            $('#total-scan').text(data.counter_ok);
 
-                            if (!localStorage.getItem('counter')) {
+                            if (!localStorage.getItem('counter_ok')) {
                                 // set tiem
-                                localStorage.setItem('counter', data.counter);
+                                localStorage.setItem('counter_ok', data.counter_ok);
 
                                 // Set the current timestamp in local storage
                                 localStorage.setItem('counter_stored_time', new Date().getTime()
@@ -364,9 +415,9 @@
 
                     // check if kanban already exists in local storage
                     // that means MP will start for another kanban 
-                    // (so check 1st the counter, is it multiple of 100 or not)
+                    // (so check 1st the counter_ok, is it multiple of 100 or not)
 
-                    // get current counter value
+                    // get current counter_ok value
                     let current_counter = $('#total-scan').text();
 
                     // check is it multiple of 100
