@@ -76,6 +76,19 @@
                     if (data.status == "success") {
                         notif("success", data.message);
 
+                        if (!localStorage.getItem('counter_ng')) {
+                            // set tiem
+                            localStorage.setItem('counter_ng', data.counter_ng);
+
+                            // Set the current timestamp in local storage if not exist
+                            if (!localStorage.getItem('counter_stored_time')) {
+
+                                localStorage.setItem('counter_stored_time', new Date().getTime()
+                                    .toString());
+
+                            }
+                        }
+
                         setInterval(() => {
                             window.location.replace("{{ url('/trace/scan/antenna') }}");
                         }, 2000);

@@ -13,7 +13,7 @@
                         </div>
 
                         <div class="card-body">
-                            <form method="POST" action="{{ route('login.auth') }}" class="needs-validation" novalidate="">
+                            <form method="POST" action="{{ route('login.auth') }}" class="needs-validation">
                                 @csrf
                                 @method('POST')
                                 <div class="form-group">

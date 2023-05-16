@@ -25,11 +25,13 @@
                             </div>
                         </div>
                         <div class="col-2 col-sm-2 col-md-2 col-sm-12">
-                            <div class="bg-secondary pt-4"
+                            <div class="bg-dark pt-4"
                                 style="height: 100%; width: 100%; background-color: #4A5DE9; border-radius: 6px;">
                                 <div class="hero-inner">
-                                    <h6 class="text-center text-dark" style="color:#ffffff;">Progress</h6>
-                                    <h4 class="text-center text-dark" style="color:#ffffff; padding: 30px 0">67/100</h4>
+                                    <h6 class="text-center" style="color:#ffffff;">Progress</h6>
+                                    <h4 class="text-center" style="color:#ffffff; padding: 30px 0">
+                                        <span id="progress">0</span>/<span id="target">100</span>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -156,12 +158,27 @@
         function initApp() {
             let kanban = localStorage.getItem('kanban');
             let counter_ok = localStorage.getItem('counter_ok');
+            let counter_ng = localStorage.getItem('counter_ng');
+            let progress = localStorage.getItem('progress');
+
+            if (!counter_ng) {
+                counter_ng = 0;
+            }
+
+            if (!counter_ok) {
+                counter_ok = 0;
+            }
+
+            if (!progress) {
+                progress = 0;
+            }
 
             if (kanban != null || kanban != undefined) {
                 $('#kanban-scanned').text(kanban);
             }
 
-            if (counter_ok != null || counter_ok != undefined) {
+            if (counter_ok != null || counter_ok != undefined || counter_ng != null || counter_ng != undefined ||
+                progress != null || progress != undefined) {
 
                 // Get the stored timestamp from local storage
                 var storedTime = parseInt(localStorage.getItem('counter_stored_time'));
@@ -173,35 +190,19 @@
                 if (currentTime - storedTime > 86400000) {
                     // Clear the item from local storage
                     localStorage.removeItem('counter_ok');
+                    localStorage.removeItem('counter_ng');
                     localStorage.removeItem('counter_stored_time');
                 }
 
-                $('#total-scan').text(counter_ok);
+                $('#total-scan-ok').text(counter_ok);
+                $('#total-scan-ng').text(counter_ng);
+                $('#progress').text(progress);
+                $('#total-scan').text(parseInt(counter_ng) + parseInt(counter_ok));
             }
         }
 
         $(document).ready(function() {
             initApp();
-
-            var options = {
-                series: [70],
-                chart: {
-                    height: 150,
-                    type: 'radialBar',
-                },
-                plotOptions: {
-                    radialBar: {
-                        hollow: {
-                            size: '70%',
-                        }
-                    },
-                },
-                labels: ['Cricket'],
-            };
-
-            var chart = new ApexCharts(document.querySelector("#progress"), options);
-            chart.render();
-
             let first = localStorage.getItem('first');
 
             $('#code').focus();
@@ -321,6 +322,11 @@
 
             function storePart(code) {
                 let kanban = localStorage.getItem('kanban');
+                let counter_ng = localStorage.getItem('counter_ng');
+
+                if (!counter_ng) {
+                    counter_ng = 0;
+                }
 
                 $.ajax({
                     type: 'get',
@@ -333,15 +339,26 @@
                     dataType: 'json',
                     success: function(data) {
                         if (data.status == "success") {
-                            $('#total-scan').text(data.counter_ok);
+                            $('#progress').text(data.progress);
+                            $('#total-scan-ok').text(parseInt(data.counter_ok));
+                            $('#total-scan').text(parseInt(data.counter_ok) + parseInt(counter_ng));
 
                             if (!localStorage.getItem('counter_ok')) {
                                 // set tiem
                                 localStorage.setItem('counter_ok', data.counter_ok);
 
-                                // Set the current timestamp in local storage
-                                localStorage.setItem('counter_stored_time', new Date().getTime()
-                                    .toString());
+                                if (!localStorage.getItem('progress')) {
+                                    // set tiem
+                                    localStorage.setItem('progress', data.progress);
+                                }
+
+                                // Set the current timestamp in local storage if not exist
+                                if (!localStorage.getItem('counter_stored_time')) {
+
+                                    localStorage.setItem('counter_stored_time', new Date().getTime()
+                                        .toString());
+
+                                }
                             }
 
                             notifMessege("success", data.code);

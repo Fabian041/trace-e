@@ -172,26 +172,29 @@ class TraceabilityController extends Controller
             }
 
 
-            $key = 'electric_antenna';
+            $key = 'electric_antenna_ok';
             if (Cache::has($key)) {
                 $cache = Cache::get($key);
                 if (!isset($cache[date('Y-m-d')])) {
                     $cache = [];
                     $cache = [
                         date('Y-m-d') => [
-                            'counter' => 1
+                            'counter_ok' => 1
                         ]
                     ];
                 } else {
-                    $cache[date('Y-m-d')]['counter'] += 1;
+                    $cache[date('Y-m-d')]['counter_ok'] += 1;
                 }
             } else {
                 $cache = [
                     date('Y-m-d') => [
-                        'counter' => 1
+                        'counter_ok' => 1
                     ]
                 ];
             }
+
+            // get current qty for spesific kanban series
+            $qty = TraceAntenna::where('kanban_id', $kanban->id)->count();
 
             Cache::forever($key, $cache);
 
@@ -207,7 +210,8 @@ class TraceabilityController extends Controller
 
         return [
             "status" => "success",
-            "counter_ok"   => $cache[date('Y-m-d')]['counter'],
+            "counter_ok"   => $cache[date('Y-m-d')]['counter_ok'],
+            "progress" => $qty,
             "code" => $request->code
         ];
     }
@@ -264,6 +268,29 @@ class TraceabilityController extends Controller
                 'date' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
+            $key = 'electric_antenna_ng';
+            if (Cache::has($key)) {
+                $cache = Cache::get($key);
+                if (!isset($cache[date('Y-m-d')])) {
+                    $cache = [];
+                    $cache = [
+                        date('Y-m-d') => [
+                            'counter_ng' => 1
+                        ]
+                    ];
+                } else {
+                    $cache[date('Y-m-d')]['counter_ng'] += 1;
+                }
+            } else {
+                $cache = [
+                    date('Y-m-d') => [
+                        'counter_ng' => 1
+                    ]
+                ];
+            }
+
+            Cache::forever($key, $cache);
+
             DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -275,6 +302,7 @@ class TraceabilityController extends Controller
 
         return [
             'status' => 'success',
+            "counter_ng"   => $cache[date('Y-m-d')]['counter_ng'],
             'message' => 'Part NG Berhasil Disimpan'
         ];
     }
