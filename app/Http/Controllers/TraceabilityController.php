@@ -148,7 +148,6 @@ class TraceabilityController extends Controller
         $checkPart = TraceAntenna::where('code', $code)->first();
         $checkNgPart = TraceNg::where('code', $code)->first();
 
-
         if ($checkPart != null || $checkNgPart != null) {
             return [
                 'status' => 'exist'
@@ -195,6 +194,13 @@ class TraceabilityController extends Controller
 
             // get current qty for spesific kanban series
             $qty = TraceAntenna::where('kanban_id', $kanban->id)->count();
+
+            // reset kanban when quantity inside kanban already 100
+            if ($qty == 100) {
+                $reset = TraceAntenna::where('kanban_id', $kanban->id)->update([
+                    'kanban_id' => NULL
+                ]);
+            }
 
             Cache::forever($key, $cache);
 

@@ -5,7 +5,7 @@
         <div class="col-12 col-sm-12 col-md-12">
             <h5 class="mb-3 text-right"><span class="badge badge-dark" style="border-radius: 7px !important">Welcome,
                     {{ auth()->user()->name }}</span></h5>
-            <div class="shadow hero bg-white text-dark rounded-3">
+            <div class="shadow hero bg-white text-dark rounded-3" style="border-top-color: blue !important;">
                 <div class="hero-inner">
                     <input id="code" type="text" class="form-control" name="code" tabindex="1"
                         placeholder="scan part here..." required autofocus autocomplete="off">
@@ -25,12 +25,12 @@
                             </div>
                         </div>
                         <div class="col-2 col-sm-2 col-md-2 col-sm-12">
-                            <div class="bg-dark pt-4"
+                            <div class="bg-secondary pt-4"
                                 style="height: 100%; width: 100%; background-color: #4A5DE9; border-radius: 6px;">
                                 <div class="hero-inner">
-                                    <h6 class="text-center" style="color:#ffffff;">Progress</h6>
-                                    <h4 class="text-center" style="color:#ffffff; padding: 30px 0">
-                                        <span id="progress">0</span>/<span id="target">100</span>
+                                    <h6 class="text-center text-dark" style="color:#ffffff;">kanban</h6>
+                                    <h4 class="text-center text-dark" style="color:#ffffff; padding: 30px 0">
+                                        <span id="kanban-scanned">-</span>
                                     </h4>
                                 </div>
                             </div>
@@ -61,10 +61,12 @@
                             </div>
                         </div>
                         <div class="col-5 col-sm-5 col-md-5 col-sm-12">
-                            <h5 class="text-center mb-3" style="color:#595757;">Kanban</h5>
+                            <h5 class="text-center mb-3" style="color:#595757;">Scan Progress</h5>
                             <div class="bg-warning m-auto"
                                 style="height: 7rem; width: 100%; background-color:#EAEEED; border-radius: 6px; padding: 35px 0">
-                                <h1 class="text-center" style="color: #ffffff;" id="kanban-scanned"></h1>
+                                <h1 class="text-center" style="color: #ffffff;">
+                                    <span id="progress">0</span>/<span id="target">100</span>
+                                </h1>
                             </div>
                         </div>
                     </div>
@@ -73,18 +75,8 @@
         </div>
 
         <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
-            <div class="shadow pt-4" style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
-                <div class="hero-inner">
-                    <h5 class="text-center" style="color:#595757;">Total NG</h5>
-                    <div class="bg-danger m-auto shadow"
-                        style="height: 13rem; width: 85%; border-radius: 6px; padding: 80px 0">
-                        <h1 class="text-center" style="color:#ffffff; font-size:3rem" id="total-scan-ng">0</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
-            <div class="shadow pt-4" style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
+            <div class="shadow card card-success pt-4"
+                style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
                 <div class="hero-inner">
                     <h5 class="text-center" style="color:#595757;">Total OK</h5>
                     <div class="bg-success m-auto shadow"
@@ -95,7 +87,20 @@
             </div>
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
-            <div class="shadow pt-4" style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
+            <div class="shadow pt-4 card card-danger"
+                style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
+                <div class="hero-inner">
+                    <h5 class="text-center" style="color:#595757;">Total NG</h5>
+                    <div class="bg-danger m-auto shadow"
+                        style="height: 13rem; width: 85%; border-radius: 6px; padding: 80px 0">
+                        <h1 class="text-center" style="color:#ffffff; font-size:3rem" id="total-scan-ng">0</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-sm-4 mt-4">
+            <div class="shadow pt-4 card card-info"
+                style="height: 7rem; width: 100%; background-color: #ffffff; border-radius: 6px">
                 <div class="hero-inner">
                     <h5 class="text-center" style="color:#595757;">Total Scan</h5>
                     <div class="bg-info m-auto shadow"
@@ -141,6 +146,57 @@
                                     <div class="wizard-step-label">
                                         Kembali ke Step 1
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- end of modal --}}
+
+    {{-- modal judgement --}}
+    <div class="modal fade" tabindex="-1" role="dialog" id="judgementModal">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Judgement Part</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-lg-4">
+                            <div class="pricing pricing-highlight">
+                                <div class="pricing-cta">
+                                    <a href="#">OK <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-4">
+                            <div class="pricing pricing-highlight">
+                                <div class="pricing-cta">
+                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-4">
+                            <div class="pricing pricing-highlight">
+                                <div class="pricing-cta">
+                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-4">
+                            <div class="pricing pricing-highlight">
+                                <div class="pricing-cta">
+                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-4">
+                            <div class="pricing pricing-highlight">
+                                <div class="pricing-cta">
+                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -201,6 +257,7 @@
             }
         }
 
+        $('#judgmentModal').modal('hide');
         $(document).ready(function() {
             initApp();
             let first = localStorage.getItem('first');
@@ -232,10 +289,10 @@
                 {
                     barcodecomplete = barcode;
                     barcode = "";
-                    console.log(barcodecomplete);
                     if (barcodecomplete.length == 21) {
                         // if data kanban exists inside local storage
                         if (checkDataLocal() == true) {
+                            // $('#judgementModal').modal('show');
                             // insert part
                             storePart(barcodecomplete);
 
@@ -244,6 +301,14 @@
                         }
                     } else if (barcodecomplete.length == 230) {
                         storeKanban(barcodecomplete);
+                    } else if (barcodecomplete == "UNCOMPLETE") {
+
+                        // remove item kanban
+                        localStorage.removeItem('kanban');
+
+                        // remove item progress
+                        localStorage.removeItem('progress');
+
                     }
                     // improve ng at double scan part
                     else if (barcodecomplete.length <= 2) {
@@ -339,25 +404,28 @@
                     dataType: 'json',
                     success: function(data) {
                         if (data.status == "success") {
-                            $('#progress').text(data.progress);
+
+                            // if progress already hit 100, reset kanban local storage
+                            if (data.progress == 100) {
+                                localStorage.removeItem('kanban');
+                                localStorage.removeItem('progress');
+                            }
+
+                            $('#progress').text(localStorage.getItem('progress'));
                             $('#total-scan-ok').text(parseInt(data.counter_ok));
                             $('#total-scan').text(parseInt(data.counter_ok) + parseInt(counter_ng));
 
                             if (!localStorage.getItem('counter_ok')) {
-                                // set tiem
+                                // set item
                                 localStorage.setItem('counter_ok', data.counter_ok);
-
                                 if (!localStorage.getItem('progress')) {
-                                    // set tiem
+                                    // set item
                                     localStorage.setItem('progress', data.progress);
                                 }
-
                                 // Set the current timestamp in local storage if not exist
                                 if (!localStorage.getItem('counter_stored_time')) {
-
                                     localStorage.setItem('counter_stored_time', new Date().getTime()
                                         .toString());
-
                                 }
                             }
 
@@ -447,7 +515,6 @@
                         notifMessege("error", "Part belum lengkap");
                     }
                 }
-
             }
 
             function displayPart(code) {
