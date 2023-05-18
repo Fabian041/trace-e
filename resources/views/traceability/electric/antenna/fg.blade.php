@@ -1,15 +1,21 @@
 @extends('layouts.root.traceability')
 
 @section('main')
-    <div class="row mt-5">
+    <div class="row mt-2    ">
         <div class="col-12 col-sm-12 col-md-12">
+            <form action="{{ route('logout.auth') }}" method="post">
+                @csrf
+                @method('POST')
+                <button class="btn btn-lg btn-danger"
+                    style="margin-bottom: -40px; width:9rem; font-size:20px; font-weight:900" id="logout">Logout</button>
+            </form>
             <h5 class="mb-3 text-right"><span class="badge badge-dark" style="border-radius: 7px !important">Welcome,
                     {{ auth()->user()->name }}</span></h5>
-            <div class="shadow hero bg-white text-dark rounded-3" style="border-top-color: blue !important;">
+            <div class="shadow hero bg-white text-dark rounded-3"
+                style="border-top-color: blue !important; padding: 1 1 1 1;">
                 <div class="hero-inner">
                     <input id="code" type="text" class="form-control" name="code" tabindex="1"
                         placeholder="scan part here..." required autofocus autocomplete="off">
-
                     <div class="row mt-3">
                         <div class="col-md-2 col-sm-12" style="margin-top: 2.5rem">
                             <p style="color: #595757; font-size:1.5rem; font-weight: bold">Line</p>
@@ -112,6 +118,41 @@
         </div>
     </div>
 
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <button class="btn btn-lg btn-dark"
+                style="width: 180px; height:85px; border-radius: 1000px !important; font-size:25px">Jenis NG : </button>
+
+            {{-- jenis NG --}}
+            <button class="btn btn-lg btn-danger ml-3"
+                style="width: 205px; height:100px; font-weight: 800; font-size:20px" data-value="1"
+                id="jenis-ng">Ruber/dumy
+                NG</button>
+            <button class="btn btn-lg btn-danger ml-3"
+                style="width: 250px; height:100px; font-weight: 800; font-size:20px" data-value="2" id="jenis-ng">No
+                marking leak
+                test</button>
+            <button class="btn btn-lg btn-danger ml-3"
+                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="3" id="jenis-ng">kabel
+                switch
+                NG</button>
+            <button class="btn btn-lg btn-danger ml-3"
+                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="4" id="jenis-ng">kabel
+                antena
+                NG</button>
+            <button class="btn btn-lg btn-danger ml-3"
+                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="5" id="jenis-ng">Posisi
+                tube
+                NG</button>
+            <button class="btn btn-lg btn-danger ml-3"
+                style="width: 205px; height:100px; font-weight: 800; font-size:20px" data-value="6"
+                id="jenis-ng">Appearance
+                NG</button>
+            {{-- Jenis NG --}}
+
+        </div>
+    </div>
+
     {{-- modal info --}}
     <div class="modal fade" tabindex="-1" role="dialog" id="infoModal">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -155,57 +196,6 @@
         </div>
     </div>
     {{-- end of modal --}}
-
-    {{-- modal judgement --}}
-    <div class="modal fade" tabindex="-1" role="dialog" id="judgementModal">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Judgement Part</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 col-md-4 col-lg-4">
-                            <div class="pricing pricing-highlight">
-                                <div class="pricing-cta">
-                                    <a href="#">OK <i class="fas fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 col-lg-4">
-                            <div class="pricing pricing-highlight">
-                                <div class="pricing-cta">
-                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 col-lg-4">
-                            <div class="pricing pricing-highlight">
-                                <div class="pricing-cta">
-                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 col-lg-4">
-                            <div class="pricing pricing-highlight">
-                                <div class="pricing-cta">
-                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 col-lg-4">
-                            <div class="pricing pricing-highlight">
-                                <div class="pricing-cta">
-                                    <a href="#">NG <i class="fas fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- end of modal --}}
 @endsection
 
 @section('custom-script')
@@ -213,51 +203,12 @@
     <script>
         function initApp() {
             let kanban = localStorage.getItem('kanban');
-            let counter_ok = localStorage.getItem('counter_ok');
-            let counter_ng = localStorage.getItem('counter_ng');
-            let progress = localStorage.getItem('progress');
-
-            if (!counter_ng) {
-                counter_ng = 0;
-            }
-
-            if (!counter_ok) {
-                counter_ok = 0;
-            }
-
-            if (!progress) {
-                progress = 0;
-            }
 
             if (kanban != null || kanban != undefined) {
                 $('#kanban-scanned').text(kanban);
             }
-
-            if (counter_ok != null || counter_ok != undefined || counter_ng != null || counter_ng != undefined ||
-                progress != null || progress != undefined) {
-
-                // Get the stored timestamp from local storage
-                var storedTime = parseInt(localStorage.getItem('counter_stored_time'));
-
-                // Get the current timestamp
-                var currentTime = new Date().getTime();
-
-                // Check if one day has passed (24 hours = 86400000 milliseconds)
-                if (currentTime - storedTime > 86400000) {
-                    // Clear the item from local storage
-                    localStorage.removeItem('counter_ok');
-                    localStorage.removeItem('counter_ng');
-                    localStorage.removeItem('counter_stored_time');
-                }
-
-                $('#total-scan-ok').text(counter_ok);
-                $('#total-scan-ng').text(counter_ng);
-                $('#progress').text(progress);
-                $('#total-scan').text(parseInt(counter_ng) + parseInt(counter_ok));
-            }
         }
 
-        $('#judgmentModal').modal('hide');
         $(document).ready(function() {
             initApp();
             let first = localStorage.getItem('first');
@@ -275,7 +226,6 @@
                 let first = localStorage.setItem('first', 'true');
             }
 
-
             $(document).on('click', function() {
                 $('#code').focus();
             })
@@ -292,7 +242,6 @@
                     if (barcodecomplete.length == 21) {
                         // if data kanban exists inside local storage
                         if (checkDataLocal() == true) {
-                            // $('#judgementModal').modal('show');
                             // insert part
                             storePart(barcodecomplete);
 
@@ -306,9 +255,7 @@
                         // remove item kanban
                         localStorage.removeItem('kanban');
 
-                        // remove item progress
-                        localStorage.removeItem('progress');
-
+                        location.reload();
                     }
                     // improve ng at double scan part
                     else if (barcodecomplete.length <= 2) {
@@ -387,11 +334,6 @@
 
             function storePart(code) {
                 let kanban = localStorage.getItem('kanban');
-                let counter_ng = localStorage.getItem('counter_ng');
-
-                if (!counter_ng) {
-                    counter_ng = 0;
-                }
 
                 $.ajax({
                     type: 'get',
@@ -403,7 +345,12 @@
                     },
                     dataType: 'json',
                     success: function(data) {
+                        console.log(data);
+
                         if (data.status == "success") {
+
+                            // store last part scanned to local storage
+                            localStorage.setItem('last_part_scanned', data.code);
 
                             // if progress already hit 100, reset kanban local storage
                             if (data.progress == 100) {
@@ -411,23 +358,18 @@
                                 localStorage.removeItem('progress');
                             }
 
-                            $('#progress').text(localStorage.getItem('progress'));
+                            // display counter ok
                             $('#total-scan-ok').text(parseInt(data.counter_ok));
-                            $('#total-scan').text(parseInt(data.counter_ok) + parseInt(counter_ng));
 
-                            if (!localStorage.getItem('counter_ok')) {
-                                // set item
-                                localStorage.setItem('counter_ok', data.counter_ok);
-                                if (!localStorage.getItem('progress')) {
-                                    // set item
-                                    localStorage.setItem('progress', data.progress);
-                                }
-                                // Set the current timestamp in local storage if not exist
-                                if (!localStorage.getItem('counter_stored_time')) {
-                                    localStorage.setItem('counter_stored_time', new Date().getTime()
-                                        .toString());
-                                }
-                            }
+                            // display counter ng
+                            $('#total-scan-ng').text(parseInt(data.counter_ng));
+
+                            // display total counter 
+                            $('#total-scan').text(parseInt(data.counter_total));
+
+                            // display progress
+                            $('#progress').text(parseInt(data.progress));
+
 
                             notifMessege("success", data.code);
                             displayPart(data.code);
@@ -458,6 +400,59 @@
                     }
                 });
             }
+
+            // logout
+            $('button#logout').click(function() {
+                localStorage.removeItem('first');
+                localStorage.removeItem('last_part_scanned');
+            });
+
+            // if part NG
+            $('button#jenis-ng').click(function() {
+
+                // get last part scanned
+                if (!localStorage.getItem('last_part_scanned')) {
+                    notifMessege('error', 'Scan part dulu!')
+                } else {
+                    var code = localStorage.getItem('last_part_scanned');
+                }
+
+                // get button value
+                var ng_id = $(this).data('value');
+
+                $.ajax({
+                    type: 'get',
+                    url: "{{ url('/trace/scan/antenna/ng/store') }}" + '/' + ng_id + '/' + code,
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.status == "success") {
+
+                            // display progress (after decreased)
+                            $('#progress').text(parseInt(data.progress));
+
+                            // display counter ng
+                            $('#total-scan-ng').text(parseInt(data.counter_ng));
+
+                            // display counter ok
+                            $('#total-scan-ok').text(parseInt(data.counter_ok));
+
+
+                            notifMessege("success", data.message);
+                            return true
+                        } else if (data.status == "error") {
+                            notifMessege("error", data.message);
+                            return false
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status == 0) {
+                            notifMessege("error", 'Connection Error');
+                            return;
+                        }
+                        notifMessege("error", 'Internal Server Error');
+                    }
+                });
+            });
 
             function checkNg(ngId) {
                 $.ajax({

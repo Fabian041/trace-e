@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('trace_kanbans', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('master_id')->unsigned();
+            $table->bigInteger('master_id')->unsigned()->nullable();
             $table->foreign('master_id')->references('id')->on('trace_kanban_masters');
             $table->string('serial_number');
             $table->timestamps();

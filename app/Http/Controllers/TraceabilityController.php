@@ -170,30 +170,57 @@ class TraceabilityController extends Controller
                 return ['status' => 'notMatch'];
             }
 
+            // get current qty for spesific kanban series
+            $qty = TraceAntenna::where('kanban_id', $kanban->id)->count();
 
-            $key = 'electric_antenna_ok';
-            if (Cache::has($key)) {
-                $cache = Cache::get($key);
-                if (!isset($cache[date('Y-m-d')])) {
-                    $cache = [];
-                    $cache = [
+            $key_ok = 'electric_antenna_ok';
+            $key_total = 'electric_antenna_total';
+
+            // cache ok
+            if (Cache::has($key_ok)) {
+                $cache_ok = Cache::get($key_ok);
+                if (!isset($cache_ok[date('Y-m-d')])) {
+                    $cache_ok = [];
+                    $cache_ok = [
                         date('Y-m-d') => [
                             'counter_ok' => 1
                         ]
                     ];
                 } else {
-                    $cache[date('Y-m-d')]['counter_ok'] += 1;
+                    $cache_ok[date('Y-m-d')]['counter_ok'] += 1;
                 }
             } else {
-                $cache = [
+                $cache_ok = [
                     date('Y-m-d') => [
                         'counter_ok' => 1
                     ]
                 ];
             }
 
-            // get current qty for spesific kanban series
-            $qty = TraceAntenna::where('kanban_id', $kanban->id)->count();
+            // cache total
+            if (Cache::has($key_total)) {
+                $cache_total = Cache::get($key_total);
+                if (!isset($cache_total[date('Y-m-d')])) {
+                    $cache_total = [];
+                    $cache_total = [
+                        date('Y-m-d') => [
+                            'counter_total' => 1
+                        ]
+                    ];
+                } else {
+                    $cache_total[date('Y-m-d')]['counter_total'] += 1;
+                }
+            } else {
+                $cache_total = [
+                    date('Y-m-d') => [
+                        'counter_total' => 1
+                    ]
+                ];
+            }
+
+            $key_ng = 'electric_antenna_ng';
+            $cache_ng = Cache::get($key_ng, []);
+            $counter_ng = isset($cache_ng[date('Y-m-d')]['counter_ng']) ? $cache_ng[date('Y-m-d')]['counter_ng'] : 0;
 
             // reset kanban when quantity inside kanban already 100
             if ($qty == 100) {
@@ -202,7 +229,8 @@ class TraceabilityController extends Controller
                 ]);
             }
 
-            Cache::forever($key, $cache);
+            Cache::forever($key_ok, $cache_ok);
+            Cache::forever($key_total, $cache_total);
 
             DB::commit();
         } catch (\Throwable $th) {
@@ -216,7 +244,9 @@ class TraceabilityController extends Controller
 
         return [
             "status" => "success",
-            "counter_ok"   => $cache[date('Y-m-d')]['counter_ok'],
+            "counter_ok"   => $cache_ok[date('Y-m-d')]['counter_ok'],
+            "counter_total"   => $cache_total[date('Y-m-d')]['counter_total'],
+            "counter_ng"   => $counter_ng,
             "progress" => $qty,
             "code" => $request->code
         ];
@@ -254,9 +284,11 @@ class TraceabilityController extends Controller
     {
         // check if part is exist
         $ngTrace = TraceNg::where('code', $part)->first();
-        $okTrace = TraceAntenna::where('code', $part)->first();
 
-        if ($ngTrace != null || $okTrace != null) {
+        // get kanban id (serial number of kanban)
+        $kanban = TraceAntenna::select('kanban_id')->where('code', $part)->first();
+
+        if ($ngTrace != null) {
             return [
                 'status' => 'error',
                 'message' => 'Part Sudah Pernah Discan!'
@@ -266,7 +298,10 @@ class TraceabilityController extends Controller
         try {
             DB::beginTransaction();
 
-            // insert into trace ng dataabase
+            // delete from ok trace table
+            $status = TraceAntenna::where('code', $part)->delete();
+
+            // insert into trace ng database
             TraceNg::create([
                 'ng_id' => $ngId,
                 'code' => $part,
@@ -274,28 +309,48 @@ class TraceabilityController extends Controller
                 'date' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
-            $key = 'electric_antenna_ng';
-            if (Cache::has($key)) {
-                $cache = Cache::get($key);
-                if (!isset($cache[date('Y-m-d')])) {
-                    $cache = [];
-                    $cache = [
+            // get current qty for spesific kanban series
+            $qty = TraceAntenna::where('kanban_id', $kanban->kanban_id)->count();
+
+            $key_ok = 'electric_antenna_ok';
+            $key_ng = 'electric_antenna_ng';
+            $key_total = 'electric_antenna_total';
+
+            if (Cache::has($key_ng)) {
+                $cache_ng = Cache::get($key_ng);
+                if (!isset($cache_ng[date('Y-m-d')])) {
+                    $cache_ng = [];
+                    $cache_ng = [
                         date('Y-m-d') => [
                             'counter_ng' => 1
                         ]
                     ];
                 } else {
-                    $cache[date('Y-m-d')]['counter_ng'] += 1;
+                    $cache_ng[date('Y-m-d')]['counter_ng'] += 1;
                 }
             } else {
-                $cache = [
+                $cache_ng = [
                     date('Y-m-d') => [
                         'counter_ng' => 1
                     ]
                 ];
             }
 
-            Cache::forever($key, $cache);
+            // Decrease the value of counter_ok
+            if (Cache::has($key_ok)) {
+                $cache_ok = Cache::get($key_ok);
+                if (isset($cache_ok[date('Y-m-d')])) {
+                    $cache_ok[date('Y-m-d')]['counter_ok'] -= 1;
+                    if ($cache_ok[date('Y-m-d')]['counter_ok'] < 0) {
+                        $cache_ok[date('Y-m-d')]['counter_ok'] = 0;
+                    }
+                }
+            } else {
+                $cache_ok = [];
+            }
+
+            Cache::forever($key_ng, $cache_ng);
+            Cache::forever($key_ok, $cache_ok);
 
             DB::commit();
         } catch (\Throwable $th) {
@@ -308,7 +363,9 @@ class TraceabilityController extends Controller
 
         return [
             'status' => 'success',
-            "counter_ng"   => $cache[date('Y-m-d')]['counter_ng'],
+            "counter_ng"   => $cache_ng[date('Y-m-d')]['counter_ng'],
+            "counter_ok"   => $cache_ok[date('Y-m-d')]['counter_ok'],
+            'progress' => $qty,
             'message' => 'Part NG Berhasil Disimpan'
         ];
     }
