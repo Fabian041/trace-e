@@ -1,7 +1,7 @@
 @extends('layouts.root.traceability')
 
 @section('main')
-    <div class="row mt-4">
+    <div class="row mt-5">
         <div class="col-12 col-sm-12 col-md-12">
             <form action="{{ route('logout.auth') }}" method="post">
                 @csrf
