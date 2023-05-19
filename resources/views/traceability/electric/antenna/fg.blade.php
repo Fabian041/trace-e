@@ -7,7 +7,7 @@
                 @csrf
                 @method('POST')
                 <button class="btn btn-lg btn-danger"
-                    style="margin-bottom: -40px; width:9rem; font-size:20px; font-weight:900" id="logout">Logout</button>
+                    style="margin-bottom: -30px; width:9rem; font-size:20px; font-weight:900" id="logout">Logout</button>
             </form>
             <h5 class="mb-3 text-right"><span class="badge badge-dark" style="border-radius: 7px !important">Welcome,
                     {{ auth()->user()->name }}</span></h5>
@@ -126,23 +126,23 @@
             {{-- jenis NG --}}
             <button class="btn btn-lg btn-danger ml-3"
                 style="width: 205px; height:100px; font-weight: 800; font-size:20px" data-value="1"
-                id="jenis-ng">Ruber/dumy
+                id="jenis-ng">Ruber/Dumy
                 NG</button>
             <button class="btn btn-lg btn-danger ml-3"
                 style="width: 250px; height:100px; font-weight: 800; font-size:20px" data-value="2" id="jenis-ng">No
-                marking leak
-                test</button>
+                Marking Leak
+                Test</button>
             <button class="btn btn-lg btn-danger ml-3"
-                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="3" id="jenis-ng">kabel
-                switch
+                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="3" id="jenis-ng">Kabel
+                Switch
                 NG</button>
             <button class="btn btn-lg btn-danger ml-3"
-                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="4" id="jenis-ng">kabel
-                antena
+                style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="4" id="jenis-ng">Kabel
+                Antena
                 NG</button>
             <button class="btn btn-lg btn-danger ml-3"
                 style="width: 210px; height:100px; font-weight: 800; font-size:20px" data-value="5" id="jenis-ng">Posisi
-                tube
+                Tube
                 NG</button>
             <button class="btn btn-lg btn-danger ml-3"
                 style="width: 205px; height:100px; font-weight: 800; font-size:20px" data-value="6"
