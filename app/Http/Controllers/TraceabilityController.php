@@ -18,7 +18,16 @@ class TraceabilityController extends Controller
     // traceabilty dashboard
     public function traceIndex()
     {
-        return view('traceability.dashboard');
+        $currentDate = date('Y-m-d');
+
+        $ok = TraceAntenna::where('date', 'LIKE', '%' . $currentDate . '%')->count();
+        $ng = TraceNg::where('date', 'LIKE', '%' . $currentDate . '%')->count();
+
+        return view('traceability.dashboard',[
+            'ok' => $ok,
+            'ng' => $ng,
+            'total' => $ng + $ok
+        ]);
     }
 
     // modul antenna

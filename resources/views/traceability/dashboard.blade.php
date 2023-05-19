@@ -1,22 +1,63 @@
 @extends('layouts.root.main')
 
 @section('main')
-    <div class="row mt-3 ml-2">
-        <nav aria-label="breadcrumb">
-            <ol class="shadow breadcrumb breadcrumb-style1" style="background-color: #ffffff;">
-                <li class="breadcrumb-item">
-                    <a href="javascript:void(0);" style="color: black !important">Electric</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="javascript:void(0);" class="active" style="color: gray !important">Traceability</a>
-                </li>
-            </ol>
-        </nav>
+    <div class="row mt-3">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="shadow card card-success card-statistic-1 p-3" style="border-radius:6px">
+                <div class="card-icon bg-success mr-4" style="height:100px; width:25%; padding:10px 0; border-radius:5px">
+                    <i class="far fa-user"></i>
+                </div>
+                <div class="card-wrap">
+                    <div class="card-header" style="margin-top: -9px">
+                        <h3>Total OK</h3>
+                    </div>
+                    <div class="card-body">
+                        <h1>{{ $ok }}</h1>
+                    </div>
+                    <hr>
+                    <div>{{ Carbon\Carbon::parse()->toFormattedDateString() }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="shadow card card-danger card-statistic-1 p-3" style="border-radius:6px">
+                <div class="card-icon bg-danger mr-4" style="height:100px;width:25%; padding:10px 0; border-radius:5px">
+                    <i class="far fa-user"></i>
+                </div>
+                <div class="card-wrap">
+                    <div class="card-header" style="margin-top: -9px">
+                        <h3>Total NG</h3>
+                    </div>
+                    <div class="card-body">
+                        <h1>{{ $ng }}</h1>
+                    </div>
+                    <hr>
+                    <div>{{ Carbon\Carbon::parse()->toFormattedDateString() }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="shadow card card-info card-statistic-1 p-3" style="border-radius:6px">
+                <div class="card-icon bg-info mr-4" style="height:100px;width:25%; padding:10px 0; border-radius:5px">
+                    <i class="far fa-user"></i>
+                </div>
+                <div class="card-wrap">
+                    <div class="card-header" style="margin-top: -9px">
+                        <h3>Total Parts</h3>
+                    </div>
+                    <div class="card-body">
+                        <h1>{{ $total }}</h1>
+                    </div>
+                    <hr>
+                    <div>{{ Carbon\Carbon::parse()->toFormattedDateString() }}</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <div class="shadow card" style="padding: 2rem; border-radius:8px">
+            <div class=" card" style="padding: 2rem; border-radius:8px">
                 <input id="code" type="text" class="form-control" name="code" tabindex="1"
                     placeholder="scan or type part here..." required autofocus autocomplete="off">
             </div>

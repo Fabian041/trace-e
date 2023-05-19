@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('trace_kanban_masters', function (Blueprint $table) {
-            $table->integer('kanban_qty')->nullable()->after('part_number');
+        Schema::table('users', function (Blueprint $table) {
+            $table->tinyInteger('role')->default(0)->after('password');
         });
     }
 
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('trace_kanban_masters', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

@@ -23,7 +23,13 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/trace/scan/antenna');
+            if (Auth::user()->role == 1) {
+                return redirect()->route('traceability.index');
+            }
+    
+            if (Auth::user()->role == 0) {
+                return redirect()->route('antenna.index');
+            }   
         }
 
         return redirect()->back()->with('error', 'Email or password do not match our records!');
