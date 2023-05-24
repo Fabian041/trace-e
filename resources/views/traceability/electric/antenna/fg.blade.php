@@ -7,8 +7,11 @@
                 @csrf
                 @method('POST')
                 <button class="btn btn-lg btn-danger"
-                    style="margin-bottom: -30px; width:9rem; font-size:20px; font-weight:900" id="logout">Logout</button>
+                    style="margin-bottom: -71px; width:9rem; font-size:20px; font-weight:900" id="logout">Logout</button>
             </form>
+            <button class="btn btn-lg btn-warning text-center"
+                style="margin-bottom: -30px; margin-left:150px; width:11rem; font-size:20px; font-weight:900; padding-left:20px"
+                id="uncomplete">UNCOMPLETE</button>
             <h5 class="mb-3 text-right"><span class="badge badge-dark" style="border-radius: 7px !important">Welcome,
                     {{ auth()->user()->name }}</span></h5>
             <div class="shadow hero bg-white text-dark rounded-3"
@@ -405,6 +408,13 @@
             $('button#logout').click(function() {
                 localStorage.removeItem('first');
                 localStorage.removeItem('last_part_scanned');
+            });
+
+            // uncomplete
+            $('button#uncomplete').click(function() {
+                localStorage.removeItem('kanban');
+                localStorage.removeItem('last_part_scanned');
+                location.reload();
             });
 
             // if part NG
